@@ -1,7 +1,8 @@
 # Pirx application
 
+Real time stream processing. Features:
 
-Predicting future traffic on the Kafka topic. 
+ * [ ] Predicting traffic on a Kafka topic. 
 
  
 ## Running test
