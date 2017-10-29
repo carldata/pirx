@@ -1,8 +1,19 @@
 # Pirx application
 
-Real time stream processing. Features:
+Real time data analytics. This application analyzes data on kafka topic using various approaches.
+
+Currently implemented:
 
  * [ ] Predicting traffic on a Kafka topic. 
+ 
+
+## Datasets
+
+This application will create time series data and save it to the Cassandra.
+It will create the following series:
+
+ * `pirx-data-count` - Number of records read from kafka topic every 1 second
+ * `pirx-data-count-prediction` - Predicted number of records on kafka topic every 1 second 
 
  
 ## Running test
