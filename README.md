@@ -4,18 +4,10 @@ Real time data analytics. This application analyzes data on kafka topic using va
 
 Currently implemented:
 
- * [ ] Predicting traffic on a Kafka topic. 
+ * [x] Predicting traffic on a Kafka topic in the next second
+ * [ ] Predict 1sec traffic 10 seconds from now
  
 
-## Datasets
-
-This application will create time series data and save it to the Cassandra.
-It will create the following series:
-
- * `pirx-data-count` - Number of records read from kafka topic every 1 second
- * `pirx-data-count-prediction` - Predicted number of records on kafka topic every 1 second 
-
- 
 ## Running test
  
  ```bash

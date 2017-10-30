@@ -1,2 +1,2 @@
 #!/bin/sh
-java -Dlogback.configurationFile=/root/gelf.xml -jar /root/pirx.jar --db=$Cassandra_Addresses --dbPort=$Cassandra_Port --keyspace=$Cassandra_Keyspace --kafka=$Kafka_Broker --prefix=$Prefix --user=$User --pass=$Password  --statsDHost=$StatsD_Host
+java -Dlogback.configurationFile=/root/gelf.xml -jar /root/pirx.jar --kafka=$Kafka_Broker --statsDHost=$StatsD_Host
