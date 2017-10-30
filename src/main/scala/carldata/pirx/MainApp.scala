@@ -43,7 +43,7 @@ object MainApp {
     val strDeserializer = (new StringDeserializer).getClass.getName
     val props = new Properties()
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers)
-    props.put(ConsumerConfig.GROUP_ID_CONFIG, "dumper")
+    props.put(ConsumerConfig.GROUP_ID_CONFIG, "pirx")
     props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, strDeserializer)
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, strDeserializer)
     props

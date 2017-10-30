@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: pirx
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: pirx
+    spec:
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      containers:
+      - name: pirx-container
+        image: flowworks-carlsolutions.azurecr.io/flowworks/pirx
+        env:
+        - name: Kafka_Broker
+          value: "prodkafka1:9092,prodkafka2:9092,prodkafka3:9092"
+        - name: StatsD_Host
+          value: "localhost"
+      imagePullSecrets:
+        - name: regsecret
