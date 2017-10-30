@@ -76,7 +76,7 @@ object MainApp {
   }
 
   /**
-    * Predict 0 records in the next 1 second
+    * Predict the same number of records in the next 1 second as now
     */
   def run(kafkaConsumer: KafkaConsumer[String, String]): Unit = {
     kafkaConsumer.subscribe(List(DATA_TOPIC).asJava)
@@ -85,9 +85,10 @@ object MainApp {
     while (true) {
       val batch: ConsumerRecords[String, String] = kafkaConsumer.poll(POLL_TIMEOUT)
       val records = batch.records(DATA_TOPIC).asScala
+      val value = records.size
       StatsD.increment("records", records.size)
-      StatsD.gauge("prediction1.A.error", Math.abs(records.size-prediction1))
-      prediction1 = 0
+      StatsD.gauge("prediction1.A.error", Math.abs(value-prediction1))
+      prediction1 = value
     }
   }
 
