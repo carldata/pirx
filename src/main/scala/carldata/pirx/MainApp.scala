@@ -6,6 +6,7 @@ import com.timgroup.statsd.{NonBlockingStatsDClient, ServiceCheck, StatsDClient}
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecords, KafkaConsumer}
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory
+import pl.klangner.dss.DssClient
 
 import scala.collection.JavaConverters._
 
@@ -24,9 +25,9 @@ object MainApp {
 
   private val Log = LoggerFactory.getLogger(MainApp.getClass.getName)
 
-  case class Params(kafkaBroker: String, statsDHost: String)
+  case class Params(kafkaBroker: String, statsDHost: String, dssHost: String)
 
-  def stringArg(args: Array[String], key: String, default: String): String = {
+  def stringArg(args: Array[String], key: String, default: String = ""): String = {
     val name = "--" + key + "="
     args.find(_.contains(name)).map(_.substring(name.length)).getOrElse(default).trim
   }
@@ -34,8 +35,9 @@ object MainApp {
   /** Command line parser */
   def parseArgs(args: Array[String]): Params = {
     val kafka = stringArg(args, "kafka", "localhost:9092")
-    val statsDHost = stringArg(args, "statsDHost", "none")
-    Params(kafka, statsDHost)
+    val statsDHost = stringArg(args, "statsDHost")
+    val dssHost = stringArg(args, "dss", "localhost:7074")
+    Params(kafka, statsDHost, dssHost)
   }
 
   /** Kafka configuration */
@@ -68,6 +70,7 @@ object MainApp {
     val params = parseArgs(args)
     val kafkaConsumer = new KafkaConsumer[String, String](buildConfig(params.kafkaBroker))
     StatsD.init(params.statsDHost)
+    DssClient.init(params.dssHost)
 
     Log.info("Application started")
     run(kafkaConsumer)
@@ -76,19 +79,20 @@ object MainApp {
   }
 
   /**
-    * Predict the same number of records in the next 1 second as now
+    * Predict the same number of records in the next second as now
     */
   def run(kafkaConsumer: KafkaConsumer[String, String]): Unit = {
     kafkaConsumer.subscribe(List(DATA_TOPIC).asJava)
 
-    var prediction1 = 0
+    var previousValue = 0
     while (true) {
       val batch: ConsumerRecords[String, String] = kafkaConsumer.poll(POLL_TIMEOUT)
       val records = batch.records(DATA_TOPIC).asScala
       val value = records.size
       StatsD.increment("records", records.size)
-      StatsD.gauge("prediction1.A.error", Math.abs(value-prediction1))
-      prediction1 = value
+      StatsD.gauge("prediction1.A.error", Math.abs(value-previousValue))
+      DssClient.send("pirx1", Seq(previousValue.toString), value.toString)
+      previousValue = value
     }
   }
 
