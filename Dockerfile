@@ -1,8 +1,9 @@
 FROM openjdk:jdk-alpine
 
 ENV SCALA_VERSION 2.12.4
-ENV Kafka_Broker localhost:9092
-ENV StatsD_Host none
+ENV KAFKA_BROKER localhost:9092
+ENV STATSD_HOST none
+ENV DSS_HOST localhost:7074
 
 WORKDIR /root
 ADD target/scala-2.12/pirx.jar /root/pirx.jar

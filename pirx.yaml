@@ -15,9 +15,13 @@ spec:
       - name: pirx-container
         image: flowworks-carlsolutions.azurecr.io/flowworks/pirx
         env:
-        - name: Kafka_Broker
+        - name: KAFKA_BROKER
           value: "prodkafka1:9092,prodkafka2:9092,prodkafka3:9092"
-        - name: StatsD_Host
+        - name: STATSD_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: DSS_HOST
           value: "localhost"
       imagePullSecrets:
         - name: regsecret

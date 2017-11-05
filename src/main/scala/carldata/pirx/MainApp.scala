@@ -35,7 +35,7 @@ object MainApp {
   /** Command line parser */
   def parseArgs(args: Array[String]): Params = {
     val kafka = stringArg(args, "kafka", "localhost:9092")
-    val statsDHost = stringArg(args, "statsDHost")
+    val statsDHost = stringArg(args, "statsd-host")
     val dssHost = stringArg(args, "dss", "localhost:7074")
     Params(kafka, statsDHost, dssHost)
   }
@@ -60,7 +60,8 @@ object MainApp {
       Some(client)
     }
     catch {
-      case e: Exception => Log.warn(e.getMessage)
+      case e: Exception =>
+        Log.warn(e.getMessage)
         None
     }
   }
@@ -74,8 +75,8 @@ object MainApp {
 
     Log.info("Application started")
     run(kafkaConsumer)
-    Log.info("Application Stopped")
     kafkaConsumer.close()
+    Log.info("Application Stopped")
   }
 
   /**
@@ -89,11 +90,16 @@ object MainApp {
       val batch: ConsumerRecords[String, String] = kafkaConsumer.poll(POLL_TIMEOUT)
       val records = batch.records(DATA_TOPIC).asScala
       val value = records.size
-      StatsD.increment("records", records.size)
-      StatsD.gauge("prediction1.A.error", Math.abs(value-previousValue))
-      DssClient.send("pirx1", Seq(previousValue.toString), value.toString)
+      updateMetrics(records.size, previousValue, value)
       previousValue = value
     }
+  }
+
+  /** Update all metrics and send data to the dataset */
+  def updateMetrics(nrecords: Int, predictedValue: Float, actualValue: Float): Unit = {
+    StatsD.increment("records", nrecords)
+    StatsD.gauge("prediction1.A.error", Math.abs(predictedValue-actualValue))
+    DssClient.sendTimeSeriesPoint("pirx1", actualValue)
   }
 
 }
