@@ -8,19 +8,20 @@ import org.slf4j.LoggerFactory
 /**
   * Dataset Server client
   */
-object DssClient {
+object DatasetStorage {
 
-  private val Log = LoggerFactory.getLogger(DssClient.getClass.getName)
+  private val Log = LoggerFactory.getLogger(getClass.getName)
 
-  /** Initialize dataset server connection */
-  def init(host: String): Unit = {
+  var fileStorage: FileStorage = _
 
+  def init(dataPath: String): Unit = {
+    fileStorage = new FileStorage(dataPath)
   }
 
   /** Send asynchronously data point to the server */
-  def sendTimeSeriesPoint(dataset: String, dataPoint: Float): Unit = {
+  def saveTimeSeriesPoint(dataset: String, dataPoint: Float): Unit = {
     val nowUTC = LocalDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_DATE_TIME)
     val data = s"""{"dataset":"$dataset", "data":{"index":"$nowUTC", "value":$dataPoint}}"""
-    Log.info(data)
+    fileStorage.add(dataset, data)
   }
 }

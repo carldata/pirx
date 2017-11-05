@@ -4,3 +4,4 @@ target/
 docker_build.sh
 pirx.yaml
 *.log
+data/

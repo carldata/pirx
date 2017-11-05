@@ -3,7 +3,7 @@ FROM openjdk:jdk-alpine
 ENV SCALA_VERSION 2.12.4
 ENV KAFKA_BROKER localhost:9092
 ENV STATSD_HOST none
-ENV DSS_HOST localhost:7074
+ENV DATASETS_PATH /data
 
 WORKDIR /root
 ADD target/scala-2.12/pirx.jar /root/pirx.jar

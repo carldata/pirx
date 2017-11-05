@@ -6,7 +6,7 @@ import com.timgroup.statsd.{NonBlockingStatsDClient, ServiceCheck, StatsDClient}
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecords, KafkaConsumer}
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory
-import pl.klangner.dss.DssClient
+import pl.klangner.dss.DatasetStorage
 
 import scala.collection.JavaConverters._
 
@@ -25,7 +25,7 @@ object MainApp {
 
   private val Log = LoggerFactory.getLogger(MainApp.getClass.getName)
 
-  case class Params(kafkaBroker: String, statsDHost: String, dssHost: String)
+  case class Params(kafkaBroker: String, statsDHost: String, datasetPath: String)
 
   def stringArg(args: Array[String], key: String, default: String = ""): String = {
     val name = "--" + key + "="
@@ -36,8 +36,8 @@ object MainApp {
   def parseArgs(args: Array[String]): Params = {
     val kafka = stringArg(args, "kafka", "localhost:9092")
     val statsDHost = stringArg(args, "statsd-host")
-    val dssHost = stringArg(args, "dss", "localhost:7074")
-    Params(kafka, statsDHost, dssHost)
+    val datasetPath = stringArg(args, "dataset-path", "data")
+    Params(kafka, statsDHost, datasetPath)
   }
 
   /** Kafka configuration */
@@ -71,7 +71,7 @@ object MainApp {
     val params = parseArgs(args)
     val kafkaConsumer = new KafkaConsumer[String, String](buildConfig(params.kafkaBroker))
     StatsD.init(params.statsDHost)
-    DssClient.init(params.dssHost)
+    DatasetStorage.init(params.datasetPath)
 
     Log.info("Application started")
     run(kafkaConsumer)
@@ -99,7 +99,7 @@ object MainApp {
   def updateMetrics(nrecords: Int, predictedValue: Float, actualValue: Float): Unit = {
     StatsD.increment("records", nrecords)
     StatsD.gauge("prediction1.A.error", Math.abs(predictedValue-actualValue))
-    DssClient.sendTimeSeriesPoint("pirx1", actualValue)
+    DatasetStorage.saveTimeSeriesPoint("pirx1", actualValue)
   }
 
 }
