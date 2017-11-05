@@ -6,7 +6,7 @@ import com.timgroup.statsd.{NonBlockingStatsDClient, ServiceCheck, StatsDClient}
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecords, KafkaConsumer}
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory
-import pl.klangner.dss.DatasetStorage
+import pl.klangner.ml.Models
 
 import scala.collection.JavaConverters._
 
@@ -71,7 +71,7 @@ object MainApp {
     val params = parseArgs(args)
     val kafkaConsumer = new KafkaConsumer[String, String](buildConfig(params.kafkaBroker))
     StatsD.init(params.statsDHost)
-    DatasetStorage.init(params.datasetPath)
+    Models.init(params.datasetPath)
 
     Log.info("Application started")
     run(kafkaConsumer)
@@ -80,26 +80,19 @@ object MainApp {
   }
 
   /**
-    * Predict the same number of records in the next second as now
+    * Try to predict number of records in the next batch
     */
   def run(kafkaConsumer: KafkaConsumer[String, String]): Unit = {
+    val tsModel = Models.createTimeSeriesModel("data-rate")
     kafkaConsumer.subscribe(List(DATA_TOPIC).asJava)
 
-    var previousValue = 0
     while (true) {
       val batch: ConsumerRecords[String, String] = kafkaConsumer.poll(POLL_TIMEOUT)
-      val records = batch.records(DATA_TOPIC).asScala
-      val value = records.size
-      updateMetrics(records.size, previousValue, value)
-      previousValue = value
+      val records = batch.records(DATA_TOPIC).asScala.size
+      StatsD.increment("records", records)
+      StatsD.gauge("prediction1.A.error", Math.abs(records-tsModel.predict()))
+      tsModel.addSample(records)
     }
-  }
-
-  /** Update all metrics and send data to the dataset */
-  def updateMetrics(nrecords: Int, predictedValue: Float, actualValue: Float): Unit = {
-    StatsD.increment("records", nrecords)
-    StatsD.gauge("prediction1.A.error", Math.abs(predictedValue-actualValue))
-    DatasetStorage.saveTimeSeriesPoint("pirx1", actualValue)
   }
 
 }
