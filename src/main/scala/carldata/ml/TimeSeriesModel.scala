@@ -1,16 +1,12 @@
-package pl.klangner.ml
+package carldata.ml
 
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZoneOffset}
-
-import org.slf4j.LoggerFactory
 
 /**
   * Machine Learning model and dataset storage for Time Series
   */
 class TimeSeriesModel(fileStorage: FileStorage, modelName: String) {
-
-  private val Log = LoggerFactory.getLogger(getClass.getName)
 
   /** Last added sample value */
   private var lastValue: Float = 0
@@ -18,7 +14,7 @@ class TimeSeriesModel(fileStorage: FileStorage, modelName: String) {
   /** Send asynchronously data point to the server */
   def addSample(value: Float): Unit = {
     val nowUTC = LocalDateTime.now(ZoneOffset.UTC).format(DateTimeFormatter.ISO_DATE_TIME)
-    val data = s"""{"dataset":"$modelName", "data":{"index":"$nowUTC", "value":$value}}"""
+    val data = s"""{"index":"$nowUTC", "value":$value}"""
     fileStorage.add(modelName, data)
     lastValue = value
   }

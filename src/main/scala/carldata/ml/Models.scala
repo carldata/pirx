@@ -1,4 +1,4 @@
-package pl.klangner.ml
+package carldata.ml
 
 /**
   * Create Machine Learning models.

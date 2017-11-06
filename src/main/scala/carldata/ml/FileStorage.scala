@@ -1,4 +1,4 @@
-package pl.klangner.ml
+package carldata.ml
 
 import java.io._
 import java.time.format.DateTimeFormatter
@@ -7,7 +7,7 @@ import java.time.{LocalDateTime, ZoneOffset}
 import org.slf4j.LoggerFactory
 
 /**
-  * Stores datasets into storage
+  * Stores datasets onto storage
   */
 class FileStorage(dataPath: String) {
 
@@ -31,8 +31,5 @@ class FileStorage(dataPath: String) {
         Log.info(e.toString)
     }
     finally fw.close()
-
-    Log.info(s"Added datapoint to $dataset")
-    Log.info(data)
   }
 }

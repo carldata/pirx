@@ -10,7 +10,7 @@ libraryDependencies ++= Seq(
   "de.siegmar" % "logback-gelf" % "1.0.4",
   "io.github.carldata" %% "hydra-streams" % "0.4.4",
   "com.datadoghq" % "java-dogstatsd-client" % "2.3",
-  "ch.qos.logback" % "logback-classic" % "1.2.3" % Runtime,
+  "ch.qos.logback" % "logback-classic" % "1.2.3",
 
   "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )

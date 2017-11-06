@@ -2,11 +2,11 @@ package carldata.pirx
 
 import java.util.Properties
 
+import carldata.ml.Models
 import com.timgroup.statsd.{NonBlockingStatsDClient, ServiceCheck, StatsDClient}
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecords, KafkaConsumer}
 import org.apache.kafka.common.serialization.StringDeserializer
 import org.slf4j.LoggerFactory
-import pl.klangner.ml.Models
 
 import scala.collection.JavaConverters._
 

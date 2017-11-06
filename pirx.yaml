@@ -17,11 +17,11 @@ spec:
         env:
         - name: KAFKA_BROKER
           value: "prodkafka1:9092,prodkafka2:9092,prodkafka3:9092"
+        - name: DATASETS_PATH
+          value: "/data"
         - name: STATSD_HOST
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        - name: DSS_HOST
-          value: "localhost"
       imagePullSecrets:
         - name: regsecret
